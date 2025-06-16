@@ -1,0 +1,131 @@
+{% extends "finantrack/base.html" %}
+{% load humanize %}
+{% block content %}
+<br>
+<div class="container card py-5 text-dark">
+    <div class="card-header bg-dark text-white fs-5 fw-bold">
+        Movimientos Bancarios: {{ titulo }}
+    </div>
+    <div class="card-body table-responsive">
+
+        <!-- Filtros -->
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label for="filtroCategoria" class="form-label">Categoría:</label>
+                <select id="filtroCategoria" class="form-select form-select-sm mt-1">
+                    <option value="">Todas</option>
+                    {% for categoria in categorias %}
+                    <option value="{{ categoria }}">{{ categoria }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filtroBco" class="form-label">Banco:</label>
+                <select id="filtroBco" class="form-select form-select-sm mt-1">
+                    <option value="">Todas</option>
+                    {% for banco in bancos %}
+                    <option value="{{ banco }}">{{ banco }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="fechaInicio" class="form-label">Desde:</label>
+                <input type="date" id="fechaInicio" class="form-control form-control-sm">
+            </div>
+            <div class="col-md-3">
+                <label for="fechaFin" class="form-label">Hasta:</label>
+                <input type="date" id="fechaFin" class="form-control form-control-sm">
+            </div>
+        </div>
+
+        <!-- Contador -->
+        <div id="contadorFilas" class="mb-2 text-end text-muted small">
+            Mostrando <span id="conteo">0</span> transacciones
+        </div>
+
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Categoría</th>
+                    <th>Detalle</th>
+                    <th>Monto</th>
+                    <th>Banco</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transacciones %}
+                <tr>
+                    <td data-fecha="{{ t.fecha|date:" Y-m-d" }}">{{ t.fecha|date:"d-m-Y" }}</td>
+                    <td>{{ t.categoria }}</td>
+                    <td>{{ t.detalle }}</td>
+                    <td>
+                        {% if t.cargo > 0 %}
+                        <span class="text-danger">-${{ t.cargo|floatformat:0|intcomma }}</span>
+                        {% else %}
+                        <span class="text-success">+${{ t.abono|floatformat:0|intcomma }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ t.banco }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const categoriaSelect = document.getElementById("filtroCategoria");
+        const bancoSelect = document.getElementById("filtroBco");
+        const fechaInicioInput = document.getElementById("fechaInicio");
+        const fechaFinInput = document.getElementById("fechaFin");
+        const filas = document.querySelectorAll("tbody tr");
+        const conteoSpan = document.getElementById("conteo");
+
+        function actualizarFiltrado() {
+            const categoriaSeleccionada = categoriaSelect.value;
+            const bancoSeleccionado = bancoSelect.value;
+            const fechaInicio = fechaInicioInput.value;
+            const fechaFin = fechaFinInput.value;
+            let visible = 0;
+
+            filas.forEach(fila => {
+                const categoriaTexto = fila.children[1].innerText.trim();
+                const categoriaText = fila.children[4].innerText.trim();
+                const fechaTexto = fila.children[0].dataset.fecha;
+
+                let mostrar = true;
+
+                if (categoriaSeleccionada && categoriaTexto !== categoriaSeleccionada) {
+                    mostrar = false;
+                }
+                if (bancoSeleccionado && categoriaText !== bancoSeleccionado) {
+                    mostrar = false;
+                }
+
+                if (fechaInicio && fechaTexto < fechaInicio) {
+                    mostrar = false;
+                }
+
+                if (fechaFin && fechaTexto > fechaFin) {
+                    mostrar = false;
+                }
+
+                fila.style.display = mostrar ? "" : "none";
+                if (mostrar) visible++;
+            });
+
+            conteoSpan.textContent = visible;
+        }
+
+        categoriaSelect.addEventListener("change", actualizarFiltrado);
+        bancoSelect.addEventListener("change", actualizarFiltrado);
+        fechaInicioInput.addEventListener("change", actualizarFiltrado);
+        fechaFinInput.addEventListener("change", actualizarFiltrado);
+
+        actualizarFiltrado(); // Inicial
+    });
+</script>
+<br>
+{% endblock %}

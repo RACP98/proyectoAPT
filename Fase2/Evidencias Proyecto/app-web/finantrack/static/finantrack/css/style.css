@@ -4,195 +4,386 @@ body {
     background-color: #526b5c;
     color: #333;
   }
-.title {
-    color: black;
-  }
 
-  .login-page {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  
-  .login-container {
-    background-color: #ffffff;
-    padding: 2rem 3rem;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-  }
-  
-  .login-container h1 {
-    margin-bottom: 2rem;
-    color: #f6f6f6;
-  }
-  
-  form label {
-    display: block;
-    text-align: left;
-    margin-top: 1rem;
-    font-weight: bold;
-  }
-  
-  form input {
-    width: 100%;
-    padding: 0.75rem;
-    margin-top: 0.25rem;
-    border: 1px solid #ccc;
+  /* CSS BARRA*/
+.btn-navbar {
+    border: none;
     border-radius: 8px;
-  }
-  
-  button {
-    width: 100%;
-    padding: 0.75rem;
-    margin-top: 1rem;
-    border: none;
-    background-color: #2e7d32;
-    color: white;
     font-weight: bold;
+}
+
+.img-ico {
     border-radius: 10px;
-    cursor: pointer;
-  }
-  
-  button.google-btn {
-    background-color: #4285F4;
-  }
-  
-  .divider {
-    margin: 1.5rem 0 0.5rem;
-    color: #777;
-    font-size: 0.9rem;
-  }
-  
-  .login-footer {
-    margin-top: 1rem;
-    font-size: 0.9rem;
-  }
-  
-  .login-footer a {
-    color: #f6f6f6;
-    text-decoration: none;
-    font-weight: bold;
-  }
+}
 
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color:#f6f6f6;
+
+/* CSS PERFIL*/
+.perfil-container {
+    background-color: #ded8ce; 
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 600px;
+    margin: 50px auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.perfil-container h2 {
+    text-align: center;
     color: rgb(0, 0, 0);
-    padding: 1rem 2rem;
-    margin-top: 500px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
 
-  }
-  
-  .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-  
-  .nav-links {
-    list-style: none;
-    display: flex;
-    gap: 1.5rem;
-    margin-top: 500px;
-  }
-  
-  .nav-links li a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
-  .dashboard-container {
+.perfil-form label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.perfil-form input {
+    width: 100%;
+    padding: 8px 0;
+    border: none;
+    border-bottom: 2px solid #555;
+    background-color: transparent;
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+.perfil-form input:focus {
+    outline: none;
+    border-bottom-color: #2b4d3b;
+}
+
+.perfil-form .icon-container {
     display: flex;
     justify-content: center;
-    gap: 2rem;
-    padding: 3rem;
-    flex-wrap: wrap;
-  }
-  
-  .card {
-    background-color: #ffffff;
-    padding: 2rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    width: 300px;
-    text-align: center;
-  }
-  
-  .card .btn {
-    margin-top: 1rem;
-    display: inline-block;
-    background-color: #2e7d32;
+    margin: 20px 0;
+}
+
+.perfil-form .icon-container i {
+    font-size: 60px;
+    color: #4d6256;
+    background-color: white;
+    border-radius: 50%;
+    padding: 20px;
+}
+
+.perfil-form .btn-guardar {
+    background-color: #4d6256;
     color: white;
-    padding: 0.7rem 1.5rem;
-    border-radius: 10px;
-    text-decoration: none;
-  }
-  
-  .upload-container {
-    padding: 3rem;
-    text-align: center;
-  }
-  
-  .upload-form {
-    margin-top: 2rem;
-  }
-  
-  .upload-form input[type="file"] {
-    margin-bottom: 1rem;
-  }
-  
-  .upload-form .btn {
-    background-color: #2e7d32;
-    color: white;
-    padding: 0.7rem 1.2rem;
     border: none;
-    border-radius: 10px;
-    cursor: pointer;
-  }
-  
-  /* Centrar el contenedor en el medio de la página */
-.container {
+    padding: 10px 30px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    float: right;
+    transition: background-color 0.3s ease;
+}
+
+.perfil-form .btn-guardar:hover {
+    background-color: #3a4b3f;
+}
+
+ion-icon {
+    font-size: 80px;
+    color: white;
+    background-color: #526b5c;
+    border-radius: 20px;
+    padding: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+
+
+/* CSS DASHBOARD*/
+.dashboard-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.1); /* Fondo semi-transparente */
 }
 
-/* Estilo del cuadro donde está el formulario */
-.box {
-  background: rgba(255, 255, 255, 0.8); /* Fondo blanco semi-transparente */
-  backdrop-filter: blur(10px); /* Efecto de difuminado */
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  width: 300px; /* Ajusta el tamaño según lo necesites */
+.sidebar {
+  width: 80px;
+  background-color: #4d6256;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
 }
 
-.box input[type="file"] {
-  margin-bottom: 10px;
-  width: 100%;
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+.sidebar ul {
+  list-style: none;
+  padding: 0;
 }
 
-.box button {
-  padding: 10px 20px;
-  border-radius: 5px;
-  background-color: #4CAF50;
+.sidebar li {
+  margin: 20px 0;
+  font-size: 24px;
   color: white;
-  border: none;
   cursor: pointer;
 }
 
-.box button:hover {
-  background-color: #45a049;
+.main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #f4f4f4;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 20px;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.user-info ion-icon {
+  font-size: 24px;
+  margin-left: 15px;
+  color: #4d6256;
+  cursor: pointer;
+}
+
+.card-container {
+  display: flex;
+  gap: 20px;
+  padding: 30px;
+  flex-wrap: wrap;
+}
+
+.card {
+  flex: 1;
+  min-width: 200px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  text-align: center;
+  font-weight: bold;
+  color: #4d6256;
+}
+
+/* CSS INPUT EXCEL*/
+.upload-form-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.upload-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: white;
+    padding: 15px 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.upload-form input[type="file"] {
+    flex: 1;
+    border-radius: 8px;
+    border: 2px solid #4d6256;
+    padding: 8px 12px;
+    font-size: 1rem;
+}
+
+.upload-form .btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 8px;
+}
+
+
+/* CSS LOGIN*/
+/* Centra todo el contenedor en pantalla */
+.login-page {
+    height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Caja principal */
+.login-container {
+    background-color: white;
+    border-radius: 40px;
+    display: flex;
+    width: 800px;
+    max-width: 100%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    overflow: hidden;
+    border: 1px solid black;
+}
+
+/* Lado izquierdo con logo y nombre */
+.login-left, .login-right {
+    padding: 40px;
+}
+
+.login-left {
+    background-color: #526b5c;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+}
+
+.login-left img {
+    width: 120px;
+    margin-bottom: 20px;
+}
+
+.login-left h1 {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+/* Lado derecho con formulario */
+.login-right {
+    background-color: #ffffff;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 0 20px 20px 0;
+}
+
+.login-right h2 {
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Estilo del formulario */
+.form-control {
+    border-radius: 0;
+    margin-bottom: 15px;
+    border: 2px solid #000;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.btn-next {
+    background-color: #1d1d1d;
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-next:hover {
+    background-color: #333;
+}
+
+.btn-alt {
+    border: 2px solid #000;
+    background-color: white;
+    width: 48%;
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
+    display: inline-block;
+    text-decoration: none;
+    color: black;
+}
+
+.btn-alt:hover {
+    background-color: #f0f0f0;
+}
+
+/* Separador "OR" */
+.or-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+    font-weight: bold;
+}
+
+.or-divider::before, .or-divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #aaa;
+}
+
+.or-divider:not(:empty)::before {
+    margin-right: .75em;
+}
+
+.or-divider:not(:empty)::after {
+    margin-left: .75em;
+}
+
+/* Enlaces */
+.text-center a {
+    text-decoration: none;
+    color: #1d1d1d;
+}
+
+.text-center a:hover {
+    text-decoration: underline;
+}
+
+
+/*CSS LOGIN*/
+.styled-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group-custom {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.form-label-custom {
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: block;
+    color: #333;
+    font-size: 16px;
+}
+
+.form-control-custom {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: border-color 0.3s ease;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+}
+
+.form-control-custom:focus {
+    border-color: #526b5c;
+    outline: none;
+    background-color: #fff;
+}
+
+.btn-next {
+    background-color: #1d1d1d;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.btn-next:hover {
+    background-color: #333;
 }

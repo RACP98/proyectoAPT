@@ -1,119 +1,104 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard Financiero</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+{% extends "finantrack/base.html" %}
+{% load static %}
+{% load humanize %}
+{% block content %}
 
 <div class="container py-5">
-    <h1 class="text-center mb-4 text-primary">Dashboard Financiero</h1>
-    <h5 class="text-end text-muted">Bienvenido, {{ user.username }}</h5>
+    <h1 class="text-center mb-5 text-white">Dashboard Financiero</h1>
 
-    <div class="row text-center mb-4">
-        <div class="col-md-4">
-            <div class="card border-success shadow-sm">
+    <!-- RESUMEN TOTAL -->
+    <div class="row mb-4 text-center">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-success">
                 <div class="card-body">
                     <h5 class="card-title text-success">Saldo Actual</h5>
-                    <p class="fs-4">${{ saldo_actual|floatformat:0 }}</p>
+                    <p class="card-text fs-4">${{ saldo_actual|floatformat:0 }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card border-primary shadow-sm">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-primary">
                 <div class="card-body">
-                    <h5 class="card-title text-primary">Total Ingresos</h5>
-                    <p class="fs-4">${{ total_abonos|floatformat:0 }}</p>
+                    <h5 class="card-title text-primary">Total Abonos</h5>
+                    <p class="card-text fs-4">${{ total_abonos|floatformat:0 }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card border-danger shadow-sm">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-danger">
                 <div class="card-body">
-                    <h5 class="card-title text-danger">Total Egresos</h5>
-                    <p class="fs-4">${{ total_cargos|floatformat:0 }}</p>
+                    <h5 class="card-title text-danger">Total Cargos</h5>
+                    <p class="card-text fs-4">${{ total_cargos|floatformat:0 }}</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-6">
-            <h4>Gastos por Categoría</h4>
-            <ul class="list-group">
-                {% for cat in gastos_categoria %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal-{{ cat.categoria|slugify }}">
-                            {{ cat.categoria }}
-                        </a>
-                        <span>${{ cat.total|floatformat:0 }}</span>
-                    </li>
-                {% endfor %}
-            </ul>
+    <!-- RESUMEN POR BANCO -->
+    <div class="row justify-content-center mb-5">
+        {% for banco in resumen_por_banco %}
+        <div class="col-md-3 mb-4">
+            <div class="card border-dark shadow-sm text-center">
+                <div class="card-body" style="background-color: #ded8ce; border-radius: 12px;">
+                    <h5 class="card-title">{{ banco.banco }}</h5>
+                    <p>Saldo: <strong>${{ banco.saldo|floatformat:0|intcomma }}</strong></p>
+                    <p class="text-success">Ingresos: ${{ banco.ingresos|floatformat:0|intcomma }}</p>
+                    <p class="text-danger">Egresos: ${{ banco.egresos|floatformat:0|intcomma }}</p>
+                </div>
+            </div>
         </div>
-
-        <div class="col-md-6">
-            <h4>Ingresos por Categoría</h4>
-            <ul class="list-group">
-                {% for cat in ingresos_categoria %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal-{{ cat.categoria|slugify }}">
-                            {{ cat.categoria }}
-                        </a>
-                        <span>${{ cat.total|floatformat:0 }}</span>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-
+        {% endfor %}
     </div>
+
+    <!-- GRAFICO BARRA -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-5 mb-4">
+            <div class="text-center text-white mb-2">
+                <h4>Gastos por Categoría</h4>
+            </div>
+            <div class="bg-white rounded-4 p-3 shadow">
+                <canvas id="gastosChart"></canvas>
+                <div class="text-center mt-3">
+                    <a href="{% url 'ver_transacciones' tipo='gastos' %}" class="btn btn-outline-dark">Ver detalle de
+                        gastos</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 mb-4">
+            <div class="text-center text-white mb-2">
+                <h4>Ingresos por Categoría</h4>
+            </div>
+            <div class="bg-white rounded-4 p-3 shadow">
+                <canvas id="ingresosChart"></canvas>
+                <div class="text-center mt-3">
+                    <a href="{% url 'ver_transacciones' tipo='ingresos' %}" class="btn btn-outline-dark">Ver detalle de
+                        ingresos</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GRAFICO TORTA -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-5 mb-4">
+            <div class="text-center text-white mb-2">
+                <h4>Gastos por Categoría</h4>
+            </div>
+            <div class="bg-white rounded-4 p-3 shadow">
+                <canvas id="gastosPieChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-5 mb-4">
+            <div class="text-center text-white mb-2">
+                <h4>Ingresos por Categoría</h4>
+            </div>
+            <div class="bg-white rounded-4 p-3 shadow">
+                <canvas id="ingresosPieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 
-
-{% for nombre, trans_list in detalles_categoria.items %}
-<div class="modal fade" id="modal-{{ nombre|slugify }}" tabindex="-1" aria-labelledby="modalLabel{{ forloop.counter }}" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Detalle: {{ nombre }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body">
-        {% if trans_list %}
-          <table class="table table-sm table-striped">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Detalle</th>
-                <th>Cargo</th>
-                <th>Abono</th>
-                <th>Banco</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for trans in trans_list %}
-                <tr>
-                  <td>{{ trans.fecha }}</td>
-                  <td>{{ trans.detalle }}</td>
-                  <td>${{ trans.cargo|floatformat:0 }}</td>
-                  <td>${{ trans.abono|floatformat:0 }}</td>
-                  <td>{{ trans.banco }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        {% else %}
-          <p>No hay transacciones registradas para esta categoría.</p>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-</div>
-{% endfor %}
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
+{% endblock %}

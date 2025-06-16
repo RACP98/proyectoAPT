@@ -2,15 +2,25 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 import pandas as pd
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from .models import Transaccion
-
-from finantrack.forms import RegistroUsuarioForm
+from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
+from finantrack.forms import RegistroUsuarioForm, PerfilUsuarioForm
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 
 def login(request):
     context = {}
     return render(request, 'finantrack/login.html', context)
 
+def base(request):
+    context = {}
+    return render(request, 'finantrack/base.html', context)
+
+def custom_logout(request):
+    logout(request)
+    return redirect('index')
 
 def categorizar(descripcion):
     descripcion = descripcion.lower()
@@ -22,13 +32,13 @@ def categorizar(descripcion):
         return 'Transporte'
     if any(palabra in descripcion for palabra in ['starbucks', 'domino','donalds', 'dg', 'carne', 'jireh', 'papa john']):
         return 'Comida'
-    if any(palabra in descripcion for palabra in ['agua', 'enel', 'movistar', 'wom', 'telefonica', 'claro']):
+    if any(palabra in descripcion for palabra in ['agua', 'awa', 'enel', 'movistar', 'wom', 'telefonica', 'claro']):
         return 'Servicios Básicos'
-    if any(palabra in descripcion for palabra in ['banco', 'cajero']):
+    if any(palabra in descripcion for palabra in ['cajero']):
         return 'Giro'
     if any(palabra in descripcion for palabra in ['crédito','hipotecario']):
         return 'Credito'
-    if any(palabra in descripcion for palabra in ['transf']):
+    if any(palabra in descripcion for palabra in ['transf','tef']):
         return 'Transferencias'
     if 'komax' in descripcion:
         return 'Sueldo'
@@ -41,18 +51,45 @@ def index(request):
         try:
             if archivo.name.endswith('.xlsx'):
                 preview = pd.read_excel(archivo, engine='openpyxl', nrows=1, header=None) # Elimina separadores de miles
-                if str(preview.iloc[0, 0]).strip().lower() == "fecha":
+                # Extraer las 10 primeras celdas de la primera columna
+                primeras_celdas = preview.iloc[:, 0].astype(str).str.strip().str.lower().tolist()
+                print("Primeras celdas leídas:", primeras_celdas)
+
+                # Detectar por contenido en las primeras celdas
+                if any("fecha" in celda for celda in primeras_celdas):
                     df = pd.read_excel(archivo, engine='openpyxl', skiprows=0, dtype=str)
                     bco = "Falabella"
                     print("Archivo detectado: Falabella")
-                    print(df.head())
-                else:
+
+                elif any("últimos movimientos" in celda for celda in primeras_celdas):
                     df = pd.read_excel(archivo, engine='openpyxl', skiprows=7, dtype=str)
                     bco = "BCI"
                     print("Archivo detectado: BCI")
-                    print(df.head())
+
+                elif any("rodrigo andres concha pezoa" in celda for celda in primeras_celdas):
+                    df = pd.read_excel(archivo, engine='openpyxl', skiprows=2, dtype=str)
+                    bco = "Santander"
+                    print("Archivo detectado: Santander",bco)
+
+                elif any("cartola cuentarut" in celda for celda in primeras_celdas):
+                    df = pd.read_excel(archivo, engine='openpyxl', skiprows=13, dtype=str)
+                    bco = "Estado"
+                    print("Archivo detectado: Banco Estado")
+                else:
+                    raise ValueError("No se pudo detectar el formato de la cartola. Revisa el archivo.")
+
             elif archivo.name.endswith('.xls'):
-                df = pd.read_excel(archivo, engine='xlrd', skiprows=0, dtype=str)
+                preview = pd.read_excel(archivo, engine='xlrd', nrows=1, header=None)
+                primeras_celdas = preview.iloc[:, 0].astype(str).str.strip().str.lower().tolist()
+                print("Primeras celdas leídas:", primeras_celdas)
+                
+                # Aquí detectas el banco
+                if any("id" in celda for celda in primeras_celdas):
+                    df = pd.read_excel(archivo, engine='xlrd', skiprows=10, dtype=str)
+                    bco = "ITAU"
+                    print("Archivo detectado: ITAU")
+
+
             elif archivo.name.endswith('.csv'):
                 df = pd.read_csv(archivo)
             else:
@@ -69,11 +106,14 @@ def index(request):
             df.rename(columns={
                 'fecha transacción': 'Fecha',
                 'fecha': 'Fecha',
-                'fecha contable': 'Fecha contable',
                 'descripción': 'Descripción',
                 'descripcion': 'Descripción',
+                'detalle': 'Descripción',
+                'movimientos': 'Descripción',
                 'cargo': 'Cargo',
-                'abono': 'Abono'
+                'abono': 'Abono',
+                'cargos': 'Cargo',
+                'abonos': 'Abono'
             }, inplace=True)
 
             # Verificación mínima
@@ -98,7 +138,7 @@ def index(request):
 
             # Procesar fechas si existe
             if 'Fecha' in df.columns:
-                df['Fecha'] = pd.to_datetime(df['Fecha'], errors='coerce', dayfirst=True)
+                df['Fecha'] = pd.to_datetime(df['Fecha'], dayfirst=True, errors='coerce')
 
             # Categorizar movimientos
             df['Categoría'] = df['Descripción'].apply(categorizar)
@@ -131,19 +171,29 @@ def index(request):
             # Agrupar gastos
             gastos = df[df['Cargo'] > 0].groupby('Categoría')['Cargo'].sum().sort_values(ascending=False).to_dict()
             abono = df[df['Abono'] > 0].groupby('Categoría')['Abono'].sum().sort_values(ascending=False).to_dict()
-
+            gastos_labels = list(gastos.keys())
+            gastos_values = list(gastos.values())
+            ingresos_labels = list(abono.keys())
+            ingresos_values = list(abono.values())
             context = {
                 'datos': df.to_dict(orient='records'),
                 'saldo_actual': df['Abono'].sum() - df['Cargo'].sum(),
                 'total_abonos': df['Abono'].sum(),
                 'total_cargos': df['Cargo'].sum(),
-                'fechas': df['Fecha'].dt.strftime('%d-%m-%Y').tolist() if 'Fecha' in df.columns else [],
-                'saldos': [],  # Puedes calcular saldos acumulados si lo deseas
+                'fechas': df['Fecha'].tolist() if 'Fecha' in df.columns else [],
+                'saldos': [],
                 'gastos_categoria': gastos,
                 'abonos_categoria': abono,
                 'bco' : bco,
+                'gastos_labels': json.dumps(gastos_labels),
+                'gastos_values': json.dumps(gastos_values, cls=DjangoJSONEncoder),
+                'ingresos_labels': json.dumps(ingresos_labels),
+                'ingresos_values': json.dumps(ingresos_values, cls=DjangoJSONEncoder),
             }
-
+            print("Gastos Labels:", gastos_labels)
+            print("Gastos Values:", gastos_values)
+            print("Ingresos Labels:", ingresos_labels)
+            print("Ingresos Values:", ingresos_values)
 
             messages.success(request, '¡Cartola cargada exitosamente!', )
 
@@ -151,10 +201,6 @@ def index(request):
             messages.error(request, f'Ocurrió un error al procesar el archivo: {str(e)}')
 
     return render(request, 'finantrack/index.html', context)
-
-
-
-
 
 def registro(request):
     if request.method == 'POST':
@@ -167,11 +213,6 @@ def registro(request):
         form = RegistroUsuarioForm()
     return render(request, 'finantrack/registro.html', {'form': form})
 
-
-from django.contrib.auth.decorators import login_required
-from .models import Transaccion
-from django.db.models import Sum
-
 @login_required
 def dashboard(request):
     transacciones = Transaccion.objects.filter(usuario=request.user)
@@ -179,15 +220,47 @@ def dashboard(request):
     total_abonos = transacciones.aggregate(Sum('abono'))['abono__sum'] or 0
     total_cargos = transacciones.aggregate(Sum('cargo'))['cargo__sum'] or 0
     saldo_actual = total_abonos - total_cargos
+    
+    # Totales por banco
+    bancos_data = transacciones.values('banco').annotate(
+        total_cargos=Sum('cargo'),
+        total_abonos=Sum('abono')
+    )
 
-    gastos_categoria = transacciones.values('categoria').annotate(total=Sum('cargo')).order_by('-total')
-    ingresos_categoria = transacciones.values('categoria').annotate(total=Sum('abono')).order_by('-total')
+    resumen_por_banco = []
+    for banco in bancos_data:
+        resumen_por_banco.append({
+            'banco': banco['banco'],
+            'ingresos': banco['total_abonos'] or 0,
+            'egresos': banco['total_cargos'] or 0,
+            'saldo': (banco['total_abonos'] or 0) - (banco['total_cargos'] or 0)
+        })
 
-    # Detalle por categoría
+    # Agrupar gastos e ingresos por categoría
+    gastos_categoria = transacciones.filter(cargo__gt=0).values('categoria').annotate(total=Sum('cargo')).order_by('-total')
+    ingresos_categoria = transacciones.filter(abono__gt=0).values('categoria').annotate(total=Sum('abono')).order_by('-total')
+
+    # Datos para Chart.js
+    gastos_labels = [g['categoria'] for g in gastos_categoria if g['total'] > 0]
+    gastos_values = [float(g['total']) for g in gastos_categoria if g['total'] > 0]
+
+    ingresos_labels = [i['categoria'] for i in ingresos_categoria if i['total'] > 0]
+    ingresos_values = [float(i['total']) for i in ingresos_categoria if i['total'] > 0]
+
     detalles_categoria = {}
-    for cat in set(transacciones.values_list('categoria', flat=True)):
-        detalles_categoria[cat] = transacciones.filter(categoria=cat).order_by('-fecha')
+    tipos_categoria = {}
 
+    categorias = set(transacciones.values_list('categoria', flat=True))
+
+    for cat in categorias:
+        trans_list = transacciones.filter(categoria=cat)
+        detalles_categoria[cat] = trans_list
+        tipos_categoria[cat] = "gasto" if trans_list.filter(cargo__gt=0).exists() else "ingreso"
+
+    # Transacciones separadas por tipo
+    transacciones_ingresos = list(transacciones.filter(abono__gt=0).values())
+    transacciones_egresos = list(transacciones.filter(cargo__gt=0).values())
+    
     context = {
         'total_abonos': total_abonos,
         'total_cargos': total_cargos,
@@ -195,5 +268,59 @@ def dashboard(request):
         'gastos_categoria': gastos_categoria,
         'ingresos_categoria': ingresos_categoria,
         'detalles_categoria': detalles_categoria,
+        'tipos_categoria': tipos_categoria,
+        'resumen_por_banco': resumen_por_banco,
+        'gastos_labels': json.dumps(gastos_labels),
+        'gastos_values': json.dumps(gastos_values, cls=DjangoJSONEncoder),
+        'ingresos_labels': json.dumps(ingresos_labels),
+        'ingresos_values': json.dumps(ingresos_values, cls=DjangoJSONEncoder),
     }
     return render(request, 'finantrack/dashboard.html', context)
+
+@login_required
+def ver_transacciones(request, tipo):
+    transacciones = Transaccion.objects.filter(usuario=request.user).order_by('-fecha')
+    if tipo == 'gastos':
+        transacciones = transacciones.filter(cargo__gt=0)
+        titulo = "Detalle de Gastos"
+        categorias = (
+            transacciones .values_list('categoria', flat=True) .distinct() .order_by('categoria')
+        )
+        bancos = (
+            transacciones .values_list('banco', flat=True) .distinct() .order_by('banco')
+        )
+    else:
+        transacciones = transacciones.filter(abono__gt=0)
+        titulo = "Detalle de Ingresos"
+        categorias = (
+            transacciones .values_list('categoria', flat=True) .distinct() .order_by('categoria')
+        )
+        bancos = (
+            transacciones .values_list('banco', flat=True) .distinct() .order_by('banco')
+        )
+    return render(request, 'finantrack/detalle_transacciones.html', {
+        'transacciones': transacciones,
+        'categorias': categorias,
+        'bancos': bancos,
+        'titulo': titulo
+    })
+
+@login_required
+def perfil(request):
+    user = request.user
+    if request.method == 'POST':
+        form = PerfilUsuarioForm(request.POST, instance=user)
+        if form.is_valid():
+            user = form.save(commit=False)
+            password = form.cleaned_data.get('password')
+            if password:
+                user.set_password(password)
+            user.save()
+            messages.success(request, 'Perfil actualizado exitosamente.')
+            return redirect('login')  # Asegúrate de tener la URL 'perfil'
+    else:
+        form = PerfilUsuarioForm(instance=user)
+    return render(request, 'finantrack/perfil.html', {
+        'form': form,
+        'username': user.username
+    })

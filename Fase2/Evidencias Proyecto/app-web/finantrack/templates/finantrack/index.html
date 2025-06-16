@@ -1,47 +1,30 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>FinanTrack</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-</head>
-<body class="bg-light">
-{% if user.is_authenticated %}
-    <div class="text-end mb-3">
-        <p class="fw-bold text-success">Bienvenido, {{ user.first_name }} 👋</p>
-        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Cerrar sesión</a>
-    </div>
-{% endif %}
+{% extends "finantrack/base.html" %}
+{% load static %}
+{% block content %}
 
 <div class="container py-5">
-
-    <h1 class="mb-4 text-center fw-bold text-primary">Resumen Financiero</h1>
-
+    <h1 class="text-center mb-5 text-white">Resumen Financiero</h1>
     <!-- Mensajes Django -->
     {% if messages %}
-      <div class="alert alert-info text-center" role="alert">
+    <div id="message-container" class="alert alert-info text-center" role="alert">
         {% for message in messages %}
-            {{ message }}
+        {{ message }}
         {% endfor %}
-      </div>
+    </div>
     {% endif %}
 
     <!-- Formulario -->
-    <div class="mb-5 d-flex justify-content-center">
-        <form method="POST" enctype="multipart/form-data" class="text-center">
+    <div class="upload-form-container">
+        <form method="POST" enctype="multipart/form-data" class="upload-form" style="width: 100%; max-width: 600px;">
             {% csrf_token %}
-            <div class="input-group mb-3">
-                <input class="form-control" type="file" name="archivo" accept=".xlsx,.csv,.xls" required>
-                <button class="btn btn-success" type="submit">Cargar Cartola</button>
-            </div>
+            <input type="file" name="archivo" accept=".xlsx,.csv,.xls" required>
+            <button class="btn btn-success" type="submit">Cargar Cartola</button>
         </form>
     </div>
 
+
     {% if datos %}
-    <h1 class="mb-4 text-center fw-bold text-primary">Banco {{bco}}</h1>
-   
+    <h1 class="text-center mb-5 text-white">Banco {{bco}}</h1>
     <!-- Tarjetas de resumen -->
     <div class="row mb-4 text-center">
         <div class="col-md-4 mb-3">
@@ -70,79 +53,124 @@
         </div>
     </div>
 
-<!-- OTROOOOO de resumen -->
-        <div class="row mb-4 text-center">
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm border-success">
-                <div class="card-body">
-                    <h5 class="card-title text-success">Gastos por categoría</h5>
-                      <ul>
-                        {% for cat, monto in gastos_categoria.items %}
-                            <li>{{ cat }}: ${{ monto|floatformat:0 }}</li>
-                        {% endfor %}
-                      </ul>
+        <!-- Aqui quiero agregar los mismo datos de los graficos de arroba pero en torta -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-5 mb-4">
+                <div class="text-center text-white mb-2">
+                    <h4>Gastos por Categoría</h4>
+                </div>
+                <div class="bg-white rounded-4 p-3 shadow">
+                    <canvas id="gastosPieChart"></canvas>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm border-primary">
-                <div class="card-body">
-                    <h5 class="card-title text-primary">Abonos por categoría</h5>
-                      <ul>
-                      {% for cat, monto in abonos_categoria.items %}
-                          <li>{{ cat }}: ${{ monto|floatformat:0 }}</li>
-                      {% endfor %}
-                      </ul>   
+            <div class="col-md-5 mb-4">
+                <div class="text-center text-white mb-2">
+                    <h4>Ingresos por Categoría</h4>
+                </div>
+                <div class="bg-white rounded-4 p-3 shadow">
+                    <canvas id="ingresosPieChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Gráficos -->
-    <div class="row mb-5">
-      <div class="col-md-6 mb-4">
-          <div class="card shadow-sm">
-              <div class="card-header bg-warning text-dark">
-                  Gastos por Categoría
-              </div>
-              <div class="card-body">
-                  <canvas id="gastosChart" style="height:300px;"></canvas>
-              </div>
-          </div>
-      </div>
-    </div>
 
-    <!-- Tabla -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-secondary text-white">Movimientos Bancarios</div>
-        <div class="card-body table-responsive">
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Descripción</th>
-                        <th>Categoría</th>
-                        <th>Cargo</th>
-                        <th>Abono</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in datos %}
-                    <tr>
-                        <td>{{ row.Fecha|date:"d-m-Y" }}</td>
-                        <td>{{ row.Descripción }}</td>
-                        <td>{{ row.Categoría }}</td>
-                        <td>${{ row.Cargo|floatformat:0 }}</td>
-                        <td>${{ row.Abono|floatformat:0 }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<!-- Tabla -->
+<div class="card shadow-sm">
+    <div class="card-header bg-secondary text-white">Movimientos Bancarios</div>
+    <div class="card-body table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Descripción</th>
+                    <th>Categoría</th>
+                    <th>Cargo</th>
+                    <th>Abono</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in datos %}
+                <tr>
+                    <td>{{ row.Fecha|date:"d-m-Y" }}</td>
+                    <td>{{ row.Descripción }}</td>
+                    <td>{{ row.Categoría }}</td>
+                    <td>${{ row.Cargo|floatformat:0 }}</td>
+                    <td>${{ row.Abono|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    {% endif %}
+</div>
+<br>
+{% endif %}
 
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const gastosLabels = JSON.parse('{{ gastos_labels|escapejs }}');
+    const gastosData = JSON.parse('{{ gastos_values|escapejs }}');
+    const ingresosLabels = JSON.parse('{{ ingresos_labels|escapejs }}');
+    const ingresosData = JSON.parse('{{ ingresos_values|escapejs }}');
 
-</body>
-</html>
+    const ctxGastos = document.getElementById('gastosPieChart').getContext('2d');
+    new Chart(ctxGastos, {
+        type: 'doughnut',
+        data: {
+            labels: gastosLabels,
+            datasets: [{
+                data: gastosData,
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#6BCB77', '#FF9F40']
+            }]
+        }
+    });
+
+    const ctxIngresos = document.getElementById('ingresosPieChart').getContext('2d');
+    new Chart(ctxIngresos, {
+        type: 'doughnut',
+        data: {
+            labels: ingresosLabels,
+            datasets: [{
+                data: ingresosData,
+                backgroundColor: ['#36A2EB', '#4BC0C0', '#9966FF', '#FF6384', '#FFCE56']
+            }]
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const gastosLabels = JSON.parse('{{ gastos_labels|escapejs }}');
+    const gastosData = JSON.parse('{{ gastos_values|escapejs }}');
+    const ingresosLabels = JSON.parse('{{ ingresos_labels|escapejs }}');
+    const ingresosData = JSON.parse('{{ ingresos_values|escapejs }}');
+
+    const ctxGastos = document.getElementById('gastosPieChart').getContext('2d');
+    new Chart(ctxGastos, {
+        type: 'pie',
+        data: {
+            labels: gastosLabels,
+            datasets: [{
+                data: gastosData,
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#6BCB77', '#FF9F40']
+            }]
+        }
+    });
+
+    const ctxIngresos = document.getElementById('ingresosPieChart').getContext('2d');
+    new Chart(ctxIngresos, {
+        type: 'pie',
+        data: {
+            labels: ingresosLabels,
+            datasets: [{
+                data: ingresosData,
+                backgroundColor: ['#36A2EB', '#4BC0C0', '#9966FF', '#FF6384', '#FFCE56']
+            }]
+        }
+    });
+});
+
+</script>
+
+
+
+{% endblock %}

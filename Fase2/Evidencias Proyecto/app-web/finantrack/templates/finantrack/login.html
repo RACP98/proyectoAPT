@@ -4,17 +4,39 @@
 <head>
     <meta charset="UTF-8">
     <title>Iniciar Sesión</title>
-    <link rel="stylesheet" href="{% static 'finantrack/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'finantrack/css/style.css' %}">    
+    <link rel="icon" type="image/x-icon" href="{% static 'finantrack/img/logo.ico' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-    <h2>Iniciar Sesión</h2>
+    <div class="login-page">
+        <div class="login-container">
+            <div class="login-left">
+                <img src="{% static 'finantrack/img/logo1.png' %}" alt="Logo">
+                <h1>FinanTrack</h1>
+            </div>
+            <div class="login-right">
+                <h2>INGRESO</h2>
 
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Ingresar</button>
-    </form>
+            <form method="POST" class="styled-form">
+                {% csrf_token %}
+                
+                <div class="form-group-custom">
+                    <input type="text" name="username" id="id_username" class="form-control-custom" placeholder="👤 Usuario">
+                </div>
 
-    <p>¿No tienes una cuenta? <a href="{% url 'registro' %}">Regístrate aquí</a></p>
+                <div class="form-group-custom">
+                    <input type="password" name="password" id="id_password" class="form-control-custom" placeholder="🔒 Contraseña">
+                </div>
+
+                <button type="submit" class="btn-next mt-3">Iniciar sesión</button>
+            </form>
+
+                <div class="or-divider">OR WITH</div>
+
+                <p class="text-center mt-3">No tienes cuenta? <a href="{% url 'registro' %}">Regístrate aquí</a></p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
