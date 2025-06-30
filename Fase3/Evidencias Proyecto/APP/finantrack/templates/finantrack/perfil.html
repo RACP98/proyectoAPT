@@ -1,0 +1,43 @@
+{% extends "finantrack/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="perfil-container">
+  <h2>Editar Perfil</h2>
+  <form method="POST" class="perfil-form">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-6">
+            <label for="user">Nombre Usuario</label>
+            <input type="text" name="user" value="{{ user }}" readonly class="form-control-plaintext">
+        </div>
+      <div class="col-md-6">
+        <label for="first_name">First name*</label>
+        <input type="text" name="first_name" id="first_name" value="{{ user.first_name }}">
+      </div>
+      <div class="col-md-6">
+        <label for="last_name">Last name</label>
+        <input type="text" name="last_name" id="last_name" value="{{ user.last_name }}">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <label for="email">Email address*</label>
+        <input type="email" name="email" id="email" value="{{ user.email }}">
+      </div>
+      <div class="col-md-6">
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password">
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-md-12 icon-container">
+        <ion-icon name="person-sharp"></ion-icon>  <!-- Usa Bootstrap Icons o FontAwesome -->
+      </div>
+      <div class="col-md-12 text-end">
+        <button type="submit" class="btn btn-guardar">GUARDAR</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro</title>
+    <link rel="stylesheet" href="{% static 'finantrack/css/style.css' %}">    
+    <link rel="icon" type="image/x-icon" href="{% static 'finantrack/img/logo.ico' %}">
+</head>
+<body>    
+    <div class="perfil-container">
+    <h2>Registro</h2>
+        <form method="POST" class="perfil-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="col-md-12 text-end">
+                <button type="submit" class="btn btn-guardar">REGISTRARSE</button>
+            </div>
+            <p>¿Ya tienes una cuenta? <a href="{% url 'login' %}">Inicia sesión</a></p>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,389 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #526b5c;
+    color: #333;
+  }
+
+  /* CSS BARRA*/
+.btn-navbar {
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.img-ico {
+    border-radius: 10px;
+}
+
+
+/* CSS PERFIL*/
+.perfil-container {
+    background-color: #ded8ce; 
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 600px;
+    margin: 50px auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.perfil-container h2 {
+    text-align: center;
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.perfil-form label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.perfil-form input {
+    width: 100%;
+    padding: 8px 0;
+    border: none;
+    border-bottom: 2px solid #555;
+    background-color: transparent;
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+.perfil-form input:focus {
+    outline: none;
+    border-bottom-color: #2b4d3b;
+}
+
+.perfil-form .icon-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.perfil-form .icon-container i {
+    font-size: 60px;
+    color: #4d6256;
+    background-color: white;
+    border-radius: 50%;
+    padding: 20px;
+}
+
+.perfil-form .btn-guardar {
+    background-color: #4d6256;
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    float: right;
+    transition: background-color 0.3s ease;
+}
+
+.perfil-form .btn-guardar:hover {
+    background-color: #3a4b3f;
+}
+
+ion-icon {
+    font-size: 80px;
+    color: white;
+    background-color: #526b5c;
+    border-radius: 20px;
+    padding: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+
+
+/* CSS DASHBOARD*/
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 80px;
+  background-color: #4d6256;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin: 20px 0;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+}
+
+.main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #f4f4f4;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 20px;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.user-info ion-icon {
+  font-size: 24px;
+  margin-left: 15px;
+  color: #4d6256;
+  cursor: pointer;
+}
+
+.card-container {
+  display: flex;
+  gap: 20px;
+  padding: 30px;
+  flex-wrap: wrap;
+}
+
+.card {
+  flex: 1;
+  min-width: 200px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  text-align: center;
+  font-weight: bold;
+  color: #4d6256;
+}
+
+/* CSS INPUT EXCEL*/
+.upload-form-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.upload-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: white;
+    padding: 15px 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.upload-form input[type="file"] {
+    flex: 1;
+    border-radius: 8px;
+    border: 2px solid #4d6256;
+    padding: 8px 12px;
+    font-size: 1rem;
+}
+
+.upload-form .btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 8px;
+}
+
+
+/* CSS LOGIN*/
+/* Centra todo el contenedor en pantalla */
+.login-page {
+    height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Caja principal */
+.login-container {
+    background-color: white;
+    border-radius: 40px;
+    display: flex;
+    width: 800px;
+    max-width: 100%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    overflow: hidden;
+    border: 1px solid black;
+}
+
+/* Lado izquierdo con logo y nombre */
+.login-left, .login-right {
+    padding: 40px;
+}
+
+.login-left {
+    background-color: #526b5c;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+}
+
+.login-left img {
+    width: 120px;
+    margin-bottom: 20px;
+}
+
+.login-left h1 {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+/* Lado derecho con formulario */
+.login-right {
+    background-color: #ffffff;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 0 20px 20px 0;
+}
+
+.login-right h2 {
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Estilo del formulario */
+.form-control {
+    border-radius: 0;
+    margin-bottom: 15px;
+    border: 2px solid #000;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.btn-next {
+    background-color: #1d1d1d;
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-next:hover {
+    background-color: #333;
+}
+
+.btn-alt {
+    border: 2px solid #000;
+    background-color: white;
+    width: 48%;
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
+    display: inline-block;
+    text-decoration: none;
+    color: black;
+}
+
+.btn-alt:hover {
+    background-color: #f0f0f0;
+}
+
+/* Separador "OR" */
+.or-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+    font-weight: bold;
+}
+
+.or-divider::before, .or-divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #aaa;
+}
+
+.or-divider:not(:empty)::before {
+    margin-right: .75em;
+}
+
+.or-divider:not(:empty)::after {
+    margin-left: .75em;
+}
+
+/* Enlaces */
+.text-center a {
+    text-decoration: none;
+    color: #1d1d1d;
+}
+
+.text-center a:hover {
+    text-decoration: underline;
+}
+
+
+/*CSS LOGIN*/
+.styled-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group-custom {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.form-label-custom {
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: block;
+    color: #333;
+    font-size: 16px;
+}
+
+.form-control-custom {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: border-color 0.3s ease;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+}
+
+.form-control-custom:focus {
+    border-color: #526b5c;
+    outline: none;
+    background-color: #fff;
+}
+
+.btn-next {
+    background-color: #1d1d1d;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.btn-next:hover {
+    background-color: #333;
+}

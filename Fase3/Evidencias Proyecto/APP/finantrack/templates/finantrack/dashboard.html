@@ -1,0 +1,101 @@
+{% extends "finantrack/base.html" %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+
+<div class="container py-5">
+    <h1 class="text-center mb-5 text-white">Dashboard Financiero</h1>
+
+        <div class="row mb-4 text-center">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-success">
+                <div class="card-body">
+                    <h5 class="card-title text-success">Saldo Actual</h5>
+                    <p class="card-text fs-4">${{ saldo_actual|floatformat:0 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-primary">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Total Abonos</h5>
+                    <p class="card-text fs-4">${{ total_abonos|floatformat:0 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-danger">
+                <div class="card-body">
+                    <h5 class="card-title text-danger">Total Cargos</h5>
+                    <p class="card-text fs-4">${{ total_cargos|floatformat:0 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mb-5">
+        {% for banco in resumen_por_banco %}
+        <div class="col-md-3 mb-4">
+            <div class="card border-dark shadow-sm text-center">
+                <div class="card-body" style="background-color: #ded8ce; border-radius: 12px;">
+                    <h5 class="card-title">{{ banco.banco }}</h5>
+                    <p>Saldo: <strong>${{ banco.saldo|floatformat:0|intcomma }}</strong></p>
+                    <p class="text-success">Ingresos: ${{ banco.ingresos|floatformat:0|intcomma }}</p>
+                    <p class="text-danger">Egresos: ${{ banco.egresos|floatformat:0|intcomma }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-5 mb-4">
+            <div class="text-center text-white mb-2">
+                <h4>Gastos por Categoría</h4>
+            </div>
+            <div class="bg-white rounded-4 p-3 shadow">
+                <canvas id="gastosChart"></canvas>
+                <div class="text-center mt-3">
+                    <a href="{% url 'ver_transacciones' tipo='gastos' %}" class="btn btn-outline-dark">Ver detalle de
+                        gastos</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 mb-4">
+            <div class="text-center text-white mb-2">
+                <h4>Ingresos por Categoría</h4>
+            </div>
+            <div class="bg-white rounded-4 p-3 shadow">
+                <canvas id="ingresosChart"></canvas>
+                <div class="text-center mt-3">
+                    <a href="{% url 'ver_transacciones' tipo='ingresos' %}" class="btn btn-outline-dark">Ver detalle de
+                        ingresos</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aqui quiero agregar los mismo datos de los graficos de arroba pero en torta -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-5 mb-4">
+            <div class="text-center text-white mb-2">
+                <h4>Gastos por Categoría</h4>
+            </div>
+            <div class="bg-white rounded-4 p-3 shadow">
+                <canvas id="gastosPieChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-5 mb-4">
+            <div class="text-center text-white mb-2">
+                <h4>Ingresos por Categoría</h4>
+            </div>
+            <div class="bg-white rounded-4 p-3 shadow">
+                <canvas id="ingresosPieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FinanTrack</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'finantrack/css/style.css' %}" />
+  <link rel="icon" type="image/x-icon" href="{% static 'finantrack/img/logo.ico' %}" />
+
+  <!-- Chart.js (solo una vez aquí en head) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+  <!-- Ionicons -->
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+  <!-- BARRA de página -->
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{% url 'index' %}">
+        <img class="img-ico" src="{% static 'finantrack/img/logo1.png' %}" alt="Logo" width="30" height="30" />
+      </a>
+      <a class="navbar-brand btn-navbar" href="{% url 'index' %}">FinanTrack</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
+        aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarScroll">
+        <ul class="navbar-nav ms-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+          {% if user.is_authenticated %}
+          <div class="perfil-form d-flex gap-2 justify-content-end">
+            <a href="{% url 'index' %}" class="btn btn-navbar">HOME</a>
+            <a href="{% url 'dashboard' %}" class="btn btn-navbar">DASHBOARD</a>
+          </div>
+
+          <div class="dropdown ms-3">
+            <button class="btn btn-outline-success dropdown-toggle fw-bold" type="button" id="userDropdown"
+              data-bs-toggle="dropdown" aria-expanded="false">
+              Bienvenido: {{ user.first_name }} 👋
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+              <li><a class="dropdown-item" href="{% url 'perfil' %}">Perfil</a></li>
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+              <li>
+                <a class="dropdown-item text-danger" href="{% url 'logout' %}">Cerrar Sesión</a>
+              </li>
+            </ul>
+          </div>
+          {% else %}
+          <a href="{% url 'login' %}" type="button" class="btn btn-outline-success">Iniciar sesión</a>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CONTENIDO de página -->
+  <main class="flex-grow-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- PIE de página -->
+  <footer class="bg-dark text-light py-4 mt-auto">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <h5>Contacto</h5>
+          <p>Correo: info@finantrack.com</p>
+          <p>Teléfono: +123 456 7890</p>
+        </div>
+        <div class="col-md-4">
+          <h5>Enlaces</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">Términos de uso</a></li>
+            <li><a href="#">Política de privacidad</a></li>
+            <li><a href="#">Preguntas frecuentes</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <h5>Síguenos</h5>
+          <ul class="list-unstyled">
+            <li><a href="https://www.facebook.com">Facebook</a></li>
+            <li><a href="https://www.x.com">Twitter</a></li>
+            <li><a href="https://www.instagram.com/">Instagram</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-md-12 text-center">
+          <p>&copy; 2025 FinanTrack. Todos los derechos reservados.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts JS (solo 1 bundle de bootstrap, y jquery si es necesario) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"></script>
+  <!-- Script para ocultar mensajes flash -->
+  <script>
+    setTimeout(function () {
+      const message = document.getElementById("message-container");
+      if (message) {
+        message.style.transition = "opacity 0.5s ease-out";
+        message.style.opacity = "0";
+        setTimeout(() => message.remove(), 500); // Lo elimina del DOM
+      }
+    }, 5000); // 5 segundos
+  </script>
+
+  <!-- Scripts para gráficos, definidos dinámicamente -->
+  <script>
+    const gastosLabels = JSON.parse("{{ gastos_labels|escapejs }}");
+    const gastosData = JSON.parse("{{ gastos_values|escapejs }}");
+    const ingresosLabels = JSON.parse("{{ ingresos_labels|escapejs }}");
+    const ingresosData = JSON.parse("{{ ingresos_values|escapejs }}");
+
+    // Función para generar colores aleatorios
+    function generarColores(num) {
+      const colores = [];
+      for (let i = 0; i < num; i++) {
+        const r = Math.floor(Math.random() * 200) + 30;
+        const g = Math.floor(Math.random() * 200) + 30;
+        const b = Math.floor(Math.random() * 200) + 30;
+        colores.push(`rgba(${r}, ${g}, ${b}, 0.7)`);
+      }
+      return colores;
+    }
+
+    const gastosColors = generarColores(gastosLabels.length);
+    const ingresosColors = generarColores(ingresosLabels.length);
+
+    new Chart(document.getElementById("gastosChart"), {
+      type: "bar",
+      data: {
+        labels: gastosLabels,
+        datasets: [
+          {
+            label: "Gastos por Categoría",
+            data: gastosData,
+            backgroundColor: "rgba(220, 53, 69, 0.6)",
+            borderColor: "rgba(220, 53, 69, 1)",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        indexAxis: "y",
+        scales: {
+          x: { beginAtZero: true },
+        },
+      },
+    });
+
+    new Chart(document.getElementById("ingresosChart"), {
+      type: "bar",
+      data: {
+        labels: ingresosLabels,
+        datasets: [
+          {
+            label: "Ingresos por Categoría",
+            data: ingresosData,
+            backgroundColor: "rgba(40, 167, 69, 0.6)",
+            borderColor: "rgba(40, 167, 69, 1)",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        indexAxis: "y",
+        scales: {
+          x: { beginAtZero: true },
+        },
+      },
+    });
+
+    new Chart(document.getElementById("gastosPieChart"), {
+      type: "pie",
+      data: {
+        labels: gastosLabels,
+        datasets: [
+          {
+            data: gastosData,
+            backgroundColor: gastosColors,
+            borderColor: "#fff",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              color: "#333",
+              font: { size: 14 },
+            },
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                let label = context.label || "";
+                let value = context.parsed || 0;
+                return label + ": $" + value.toLocaleString();
+              },
+            },
+          },
+        },
+      },
+    });
+
+    new Chart(document.getElementById("ingresosPieChart"), {
+      type: "pie",
+      data: {
+        labels: ingresosLabels,
+        datasets: [
+          {
+            data: ingresosData,
+            backgroundColor: ingresosColors,
+            borderColor: "#fff",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              color: "#333",
+              font: { size: 14 },
+            },
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                let label = context.label || "";
+                let value = context.parsed || 0;
+                return label + ": $" + value.toLocaleString();
+              },
+            },
+          },
+        },
+      },
+    });
+  </script>
+</body>
+
+</html>
